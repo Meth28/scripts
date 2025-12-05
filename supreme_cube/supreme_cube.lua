@@ -1,3 +1,6 @@
+----https://github.com/Meth28/scripts
+----Meth28
+
 local supremeCube = Action()
 
 local config = {
