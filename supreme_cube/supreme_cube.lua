@@ -1,5 +1,6 @@
 ----https://github.com/Meth28/scripts
 ----Meth28
+----Do you want to support? https://paypal.me/tibiana
 
 local supremeCube = Action()
 
