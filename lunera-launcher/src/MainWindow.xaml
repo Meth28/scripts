@@ -1,0 +1,900 @@
+<Window x:Class="CanaryLauncherUpdate.MainWindow"
+		xmlns:system="clr-namespace:System;assembly=mscorlib"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:CanaryLauncherUpdate"
+		Icon="pack://application:,,,/Assets/launcher_ico.png"
+		mc:Ignorable="d" 
+		Height="500"
+		Width="800"
+		FontFamily="Segoe UI"
+		Background="#1a1a1a"
+		x:Name="home"
+		WindowStyle="None"
+		ResizeMode="NoResize"
+		WindowState="Normal"
+		WindowStartupLocation="CenterScreen"
+		Title="LuneraOT Launcher"
+		Loaded="TibiaLauncher_Load"
+		AllowsTransparency="True">
+	<!-- Main Container with straight edges -->
+	<Border CornerRadius="0" Background="Transparent" BorderBrush="#333" BorderThickness="1">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="40"/>   <!-- Title bar -->
+				<RowDefinition Height="140"/>  <!-- Logo section -->
+				<RowDefinition Height="130"/>  <!-- Play button section -->
+				<RowDefinition Height="120"/>  <!-- News section -->
+				<RowDefinition Height="50"/>   <!-- Footer -->
+			</Grid.RowDefinitions>
+	
+			<Grid.Resources>
+				<BitmapImage x:Key="BackGroundKey" UriSource="pack://application:,,,/Assets/background.jpg"/>
+				<BitmapImage x:Key="LogoKey" UriSource="pack://application:,,,/Assets/logo.png"/>
+				<BitmapImage x:Key="LogoCompanyKey" UriSource="pack://application:,,,/Assets/logo_company.png"/>
+				<BitmapImage x:Key="DiscordKey" UriSource="pack://application:,,,/Assets/discord.png"/>
+				<BitmapImage x:Key="BGButtonUpdateKey" UriSource="pack://application:,,,/Assets/bg_button_update.png"/>
+				<BitmapImage x:Key="ButtonPlayKey" UriSource="pack://application:,,,/Assets/button_play.png"/>
+				<BitmapImage x:Key="IconPlayKey" UriSource="pack://application:,,,/Assets/icon_play.png"/>
+				<BitmapImage x:Key="BgHintsKey" UriSource="pack://application:,,,/Assets/bg_hints.png"/>
+				<BitmapImage x:Key="RhLoreKey" UriSource="pack://application:,,,/Assets/rh_lore.png"/>
+				
+				<!-- Enhanced Storyboards for Animations -->
+				<Storyboard x:Key="ButtonHoverIn">
+					<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+									To="1.05" Duration="0:0:0.2">
+						<DoubleAnimation.EasingFunction>
+							<QuadraticEase EasingMode="EaseOut"/>
+						</DoubleAnimation.EasingFunction>
+					</DoubleAnimation>
+					<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+									To="1.05" Duration="0:0:0.2">
+						<DoubleAnimation.EasingFunction>
+							<QuadraticEase EasingMode="EaseOut"/>
+						</DoubleAnimation.EasingFunction>
+					</DoubleAnimation>
+				</Storyboard>
+				
+				<Storyboard x:Key="ButtonHoverOut">
+					<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" 
+									To="1.0" Duration="0:0:0.2">
+						<DoubleAnimation.EasingFunction>
+							<QuadraticEase EasingMode="EaseOut"/>
+						</DoubleAnimation.EasingFunction>
+					</DoubleAnimation>
+					<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)" 
+									To="1.0" Duration="0:0:0.2">
+						<DoubleAnimation.EasingFunction>
+							<QuadraticEase EasingMode="EaseOut"/>
+						</DoubleAnimation.EasingFunction>
+					</DoubleAnimation>
+				</Storyboard>
+				
+				<Storyboard x:Key="FadeInAnimation">
+					<DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.8"/>
+				</Storyboard>
+			</Grid.Resources>
+			
+			<!-- Background with overlay -->
+			<Grid Grid.RowSpan="5">
+				<Border CornerRadius="0" ClipToBounds="True">
+					<Border.Background>
+						<ImageBrush ImageSource="{StaticResource BackGroundKey}" Stretch="UniformToFill"/>
+					</Border.Background>
+				</Border>
+				<!-- Dark overlay for better contrast -->
+				<Border CornerRadius="0" Background="#40000000" ClipToBounds="True"/>
+			</Grid>
+			
+			<!-- Window Controls (No Header Bar) -->
+			<StackPanel
+				Grid.Row="0"
+				HorizontalAlignment="Right"
+				VerticalAlignment="Top"
+				Margin="0,10,15,0"
+				Orientation="Horizontal">
+				<Button
+					x:Name="MinimizeButton"
+					Style="{StaticResource WindowButtonStyle}"
+					Content="{StaticResource minimize_ico}"
+					Click="MinimizeButton_Click"
+					Cursor="Hand"
+					Margin="0,0,5,0"/>
+				<Button
+					x:Name="CloseButton"
+					Style="{StaticResource WindowButtonStyle}"
+					Content="{StaticResource close_ico}"
+					Click="CloseButton_Click"
+					Tag="IsCloseButton"
+					Cursor="Hand"/>
+			</StackPanel>
+
+			<!-- Logo Section - Top Left -->
+			<Grid Grid.Row="0" Grid.RowSpan="2">
+				<Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="85,10,0,0" Background="Transparent">
+					<Border.Effect>
+						<DropShadowEffect Color="#FFD700" Direction="0" ShadowDepth="0" Opacity="0.6" BlurRadius="15"/>
+					</Border.Effect>
+					<Image
+						x:Name="ImageLogoServer"
+						Height="140"
+						Stretch="Uniform"
+						HorizontalAlignment="Left"
+						VerticalAlignment="Top"
+						Visibility="Visible"
+						MouseLeftButtonDown="ImageLogoServer_MouseLeftButtonDown"
+						MouseMove="ImageLogoServer_MouseMove"
+						MouseLeave="ImageLogoServer_MouseLeave"
+						RenderTransformOrigin="0.5,0.5">
+						<Image.RenderTransform>
+							<ScaleTransform/>
+						</Image.RenderTransform>
+					</Image>
+				</Border>
+				
+				<!-- Discord Logo - Positioned separately -->
+				<Image
+					x:Name="DiscordLogo"
+					Height="45"
+					Width="45"
+					Source="{StaticResource DiscordKey}"
+					Stretch="Uniform"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Top"
+					Visibility="Visible"
+					Margin="15,25,0,0"
+					Cursor="Hand"
+					ToolTip="Join our Discord server!"
+					MouseLeftButtonDown="DiscordLogo_MouseLeftButtonDown">
+					<Image.Effect>
+						<DropShadowEffect Color="#5865F2" Direction="0" ShadowDepth="0" Opacity="0.4" BlurRadius="8"/>
+					</Image.Effect>
+				</Image>
+			</Grid>
+<Grid>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0">
+        <TextBlock x:Name="OnlinePlayersTextBlock"
+                   Foreground="White"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Text="Players Online: Loading..."
+                   Padding="0,2,0,0">
+            <TextBlock.Effect>
+                <DropShadowEffect Color="Black"
+                                  Direction="320"
+                                  ShadowDepth="2"
+                                  Opacity="0.7"
+                                  BlurRadius="4" />
+            </TextBlock.Effect>
+        </TextBlock>
+        
+        <Button x:Name="RefreshOnlinePlayersButton"
+                Content="Refresh Players"
+                Click="RefreshOnlinePlayersButton_Click"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Center"
+                Padding="10,5"
+                FontWeight="SemiBold" />
+    </StackPanel>
+</Grid>
+
+
+		<!-- Button Section - Under News Box -->
+			<!-- Button Section - Under News Box -->
+<Grid Grid.Row="3" Grid.RowSpan="2">
+	<Grid VerticalAlignment="Bottom" 
+		  HorizontalAlignment="Right" 
+		  Margin="0,0,50,20"
+		  Width="400">
+		
+		<Grid.RowDefinitions>
+			<RowDefinition Height="55"/> <!-- Fixed height for buttons -->
+			<RowDefinition Height="10"/> <!-- Fixed height for progress bar -->
+			<RowDefinition Height="Auto"/> <!-- Auto height for labels -->
+		</Grid.RowDefinitions>
+		
+		<!-- Buttons Container - Fixed in Grid.Row="0" -->
+		<Grid Grid.Row="0" Width="400">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="10"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			
+			<!-- Buy Global Coins Button -->
+			<Button
+				Grid.Column="0"
+				x:Name="buttonBuyCoins"
+				Height="55"
+				BorderThickness="0"
+				Cursor="Hand"
+				BorderBrush="{x:Null}"
+				Visibility="Visible"
+				Click="buttonBuyCoins_Click"
+				RenderTransformOrigin="0.5,0.5">
+				
+				<Button.RenderTransform>
+					<ScaleTransform/>
+				</Button.RenderTransform>
+
+				<Button.Background>
+					<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+						<GradientStop Color="#FFD700" Offset="0"/>
+						<GradientStop Color="#FFA500" Offset="1"/>
+					</LinearGradientBrush>
+				</Button.Background>
+
+				<Button.ToolTip>
+					<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+						<TextBlock
+							FontWeight="Bold"
+							Text="Buy Lunera Coins">
+						</TextBlock>
+					</ToolTip>
+				</Button.ToolTip>
+
+				<Button.Content>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="💰" 
+								  FontSize="20" 
+								  Margin="0,0,8,0"
+								  VerticalAlignment="Center"/>
+						<TextBlock Text="BUY COINS" 
+								  FontWeight="Bold" 
+								  FontSize="14" 
+								  Foreground="#1a1a1a" 
+								  VerticalAlignment="Center"/>
+					</StackPanel>
+				</Button.Content>
+				
+				<Button.Style>
+					<Style TargetType="{x:Type Button}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="{x:Type Button}">
+									<Border Background="{TemplateBinding Background}" 
+											CornerRadius="12"
+											BorderBrush="#66ffffff"
+											BorderThickness="1">
+										<Border.Effect>
+											<DropShadowEffect Color="Black" Direction="270" ShadowDepth="3" Opacity="0.4" BlurRadius="8"/>
+										</Border.Effect>
+										<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+									</Border>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+						<Style.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard Storyboard="{StaticResource ButtonHoverIn}"/>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard Storyboard="{StaticResource ButtonHoverOut}"/>
+								</Trigger.ExitActions>
+							</Trigger>
+						</Style.Triggers>
+					</Style>
+				</Button.Style>
+			</Button>
+			
+			<!-- Play Button -->
+			<Button
+				Grid.Column="2"
+				x:Name="buttonPlay"
+				Height="55"
+				BorderThickness="0"
+				Cursor="Hand"
+				BorderBrush="{x:Null}"
+				Visibility="Visible"
+				Click="buttonPlay_Click"
+				MouseLeave="buttonPlay_MouseLeave"
+				MouseEnter="buttonPlay_MouseEnter"
+				RenderTransformOrigin="0.5,0.5">
+
+				<Button.RenderTransform>
+					<ScaleTransform/>
+				</Button.RenderTransform>
+
+				<Button.Background>
+					<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+						<GradientStop Color="#4CAF50" Offset="0"/>
+						<GradientStop Color="#2E7D32" Offset="1"/>
+					</LinearGradientBrush>
+				</Button.Background>
+
+				<Button.ToolTip>
+					<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+						<TextBlock
+							x:Name="buttonPlay_tooltip"
+							FontWeight="Bold"
+							Text="Play Game">
+						</TextBlock>
+					</ToolTip>
+				</Button.ToolTip>
+
+				<Button.Content>
+					<StackPanel Orientation="Horizontal">
+						<Image
+							x:Name="buttonPlayIcon"
+							Source="{StaticResource IconPlayKey}"
+							Stretch="Uniform"
+							Height="28"
+							Margin="0,0,12,0"/>
+						<TextBlock Text="PLAY GLOBAL" 
+								   FontWeight="Bold" 
+								   FontSize="20" 
+								   Foreground="White" 
+								   VerticalAlignment="Center"/>
+					</StackPanel>
+				</Button.Content>
+
+				<Button.Style>
+					<Style TargetType="{x:Type Button}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="{x:Type Button}">
+									<Border Background="{TemplateBinding Background}" 
+											CornerRadius="12"
+											BorderBrush="#66ffffff"
+											BorderThickness="1">
+										<Border.Effect>
+											<DropShadowEffect Color="Black" Direction="270" ShadowDepth="3" Opacity="0.4" BlurRadius="8"/>
+										</Border.Effect>
+										<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+									</Border>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+						<Style.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Trigger.EnterActions>
+									<BeginStoryboard Storyboard="{StaticResource ButtonHoverIn}"/>
+								</Trigger.EnterActions>
+								<Trigger.ExitActions>
+									<BeginStoryboard Storyboard="{StaticResource ButtonHoverOut}"/>
+								</Trigger.ExitActions>
+							</Trigger>
+						</Style.Triggers>
+					</Style>
+				</Button.Style>
+			</Button>
+		</Grid>
+
+		<!-- Enhanced Progress Bar - Fixed in Grid.Row="1" -->
+		<ProgressBar
+			Grid.Row="1"
+			x:Name="progressbarDownload"
+			Width="400"
+			Height="10"
+			Margin="0,5,0,0"
+			Value="100"
+			Visibility="Collapsed"
+			Background="#33ffffff"
+			BorderThickness="0">
+			<ProgressBar.Foreground>
+				<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+					<GradientStop Color="#FFD700" Offset="0" />
+					<GradientStop Color="#FFA500" Offset="1" />
+				</LinearGradientBrush>
+			</ProgressBar.Foreground>
+			<ProgressBar.Style>
+				<Style TargetType="ProgressBar">
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="ProgressBar">
+								<Border Background="{TemplateBinding Background}" 
+										CornerRadius="5"
+										BorderThickness="0">
+									<Grid>
+										<Border Name="PART_Track" 
+												Background="{TemplateBinding Background}" 
+												CornerRadius="5"/>
+										<Border Name="PART_Indicator" 
+												Background="{TemplateBinding Foreground}" 
+												CornerRadius="5"
+												HorizontalAlignment="Left"/>
+									</Grid>
+								</Border>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</ProgressBar.Style>
+		</ProgressBar>
+
+		<!-- Enhanced Labels - Fixed in Grid.Row="2" -->
+		<StackPanel Grid.Row="2" Margin="0,10,0,0">
+			<TextBlock
+				x:Name="labelClientVersion"
+				FontFamily="Segoe UI"
+				FontSize="12"
+				FontWeight="SemiBold"
+				Foreground="#E0E0E0"
+				HorizontalAlignment="Center"
+				Visibility="Visible"
+				Text="Client Version"/>
+			<TextBlock
+				x:Name="labelDownloadPercent"
+				FontFamily="Segoe UI"
+				FontSize="11"
+				FontWeight="Medium"
+				Foreground="#B0B0B0"
+				HorizontalAlignment="Center"
+				Margin="0,5,0,0"
+				Visibility="Collapsed"
+				Text="Download"/>
+		</StackPanel>
+	</Grid>
+</Grid>
+		<!-- News/Hints Section - Right Side -->
+			<Grid Grid.Row="1" Grid.RowSpan="3">
+				<Border
+					Width="400"
+					Height="280"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Right"
+					Margin="0,20,50,0"
+					CornerRadius="15">
+					<Border.Background>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Color="#2a2a2a" Offset="0"/>
+							<GradientStop Color="#1e1e1e" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.Background>
+					<Border.Effect>
+						<DropShadowEffect Color="Black" Direction="270" ShadowDepth="8" Opacity="0.6" BlurRadius="20"/>
+					</Border.Effect>
+
+					<Grid Margin="20">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="40"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<!-- Enhanced Header -->
+						<Border Grid.Row="0" 
+								CornerRadius="10" 
+								HorizontalAlignment="Stretch" 
+								Padding="15,8">
+							<Border.Background>
+								<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+									<GradientStop Color="#FFD700" Offset="0"/>
+									<GradientStop Color="#FFA500" Offset="1"/>
+								</LinearGradientBrush>
+							</Border.Background>
+							<TextBlock
+								VerticalAlignment="Center"
+								HorizontalAlignment="Center"
+								FontFamily="Segoe UI"
+								FontSize="15"
+								FontWeight="Bold"
+								Foreground="#1a1a1a"
+								Text="🏆 LuneraOT NEWS &amp; UPDATES"/>
+						</Border>
+						
+						<!-- Use Canvas for absolute positioning of image -->
+						<Canvas Grid.Row="1" Margin="0,15,0,0">
+							<!-- Enhanced Character Image - Now with absolute positioning -->
+							<Border Canvas.Left="-45" 
+									Canvas.Top="-20"
+									CornerRadius="10" 
+									Padding="8"
+									Background="Transparent">
+								<Image
+									x:Name="RhLoreImage"
+									Source="{StaticResource RhLoreKey}"
+									Height="80"
+									Width="80"
+									Stretch="Uniform">
+									<Image.Effect>
+										<DropShadowEffect Color="#FFD700" Direction="0" ShadowDepth="0" Opacity="0.5" BlurRadius="10"/>
+									</Image.Effect>
+								</Image>
+							</Border>
+							
+							<!-- Enhanced Text Content -->
+							<ScrollViewer Canvas.Left="60" 
+										  Canvas.Top="0"
+										  Width="315"
+										  Height="180"
+										  VerticalScrollBarVisibility="Auto"
+										  HorizontalScrollBarVisibility="Disabled">
+								<TextBlock
+									x:Name="hintsBox"
+									Foreground="#F0F0F0"
+									FontFamily="Segoe UI"
+									FontSize="12"
+									LineHeight="18"
+									TextWrapping="Wrap"
+									Text="Loading news..."
+									Cursor="Hand"
+									MouseLeftButtonDown="HintsBox_MouseLeftButtonDown"
+									MouseRightButtonDown="HintsBox_MouseRightButtonDown">
+									<TextBlock.ToolTip>
+										<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+											<StackPanel>
+												<TextBlock Text="Left-click: Open latest news in browser" FontWeight="Bold"/>
+												<TextBlock Text="Right-click: Refresh news" FontSize="10" Foreground="#C0C0C0"/>
+											</StackPanel>
+										</ToolTip>
+									</TextBlock.ToolTip>
+								</TextBlock>
+							</ScrollViewer>
+						</Canvas>
+					</Grid>
+				</Border>
+			</Grid>
+			
+			<!-- Boosted Creatures Section - Bottom Left -->
+<Grid Grid.Row="3" Grid.RowSpan="2">
+	<!-- Main Background Container - optimized width for creatures -->
+	<Border
+		x:Name="BoostedBackgroundContainer"
+		Width="200"
+		Height="140"
+		VerticalAlignment="Bottom"
+		HorizontalAlignment="Left"
+		Margin="65,0,0,30"
+		CornerRadius="15">
+		<Border.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Color="#2a2a2a" Offset="0"/>
+				<GradientStop Color="#1e1e1e" Offset="1"/>
+			</LinearGradientBrush>
+		</Border.Background>
+		<Border.Effect>
+			<DropShadowEffect Color="Black" Direction="270" ShadowDepth="8" Opacity="0.6" BlurRadius="20"/>
+		</Border.Effect>
+	</Border>
+
+	<!-- Title Header - centered for optimized container -->
+	<Border
+		x:Name="BoostedTitle"
+		Width="160"
+		Height="Auto"
+		VerticalAlignment="Bottom"
+		HorizontalAlignment="Left"
+		Margin="85,0,0,135"
+		CornerRadius="8"
+		Padding="10,5">
+		<Border.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+				<GradientStop Color="#FFD700" Offset="0"/>
+				<GradientStop Color="#FFA500" Offset="1"/>
+			</LinearGradientBrush>
+		</Border.Background>
+		<Border.Effect>
+			<DropShadowEffect Color="Black" Direction="270" ShadowDepth="3" Opacity="0.4" BlurRadius="8"/>
+		</Border.Effect>
+		<TextBlock
+			VerticalAlignment="Center"
+			HorizontalAlignment="Center"
+			FontFamily="Segoe UI"
+			FontSize="13"
+			FontWeight="Bold"
+			Foreground="#1a1a1a"
+			Text="⚡ TODAY'S BOOSTED"/>
+	</Border>
+
+	<!-- Boosted Creature - aligned like boss -->
+	<Border
+		x:Name="BoostedCreatureContainer"
+		Width="120"
+		Height="Auto"
+		VerticalAlignment="Bottom"
+		HorizontalAlignment="Left"
+		Margin="60,0,0,45"
+		Cursor="Hand"
+		MouseLeftButtonDown="BoostedCreaturesPanel_MouseLeftButtonDown">
+		<Border.ToolTip>
+			<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+				<TextBlock Text="Click to force refresh boosted creatures from luneraot.com" FontWeight="Bold"/>
+			</ToolTip>
+		</Border.ToolTip>
+		<Border.Effect>
+			<DropShadowEffect Color="Black" Direction="270" ShadowDepth="4" Opacity="0.5" BlurRadius="10"/>
+		</Border.Effect>
+		
+		<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Image x:Name="BoostedCreatureImage"
+				   Width="60"
+				   Height="60"
+				   Stretch="Uniform"
+				   HorizontalAlignment="Center"
+				   VerticalAlignment="Center"
+				   Margin="-25,3,0,4">
+				<Image.Effect>
+					<DropShadowEffect Color="#FFD700" Direction="0" ShadowDepth="0" Opacity="0.6" BlurRadius="8"/>
+				</Image.Effect>
+			</Image>
+			<TextBlock x:Name="BoostedCreatureName"
+					   Text="Loading..."
+					   FontFamily="Segoe UI"
+					   FontSize="9"
+					   FontWeight="SemiBold"
+					   Foreground="#F0F0F0"
+					   HorizontalAlignment="Center"
+					   TextAlignment="Center"
+					   TextWrapping="Wrap"
+					   MaxWidth="100"
+					   Margin="10,2,0,2"/>
+			<TextBlock Text="CREATURE"
+					   FontFamily="Segoe UI"
+					   FontSize="8"
+					   FontWeight="Medium"
+					   Foreground="#FFD700"
+					   Margin="10,0,0,0"
+					   HorizontalAlignment="Center"
+					   TextAlignment="Center"/>
+		</StackPanel>
+	</Border>
+
+	<!-- Boosted Boss - positioned to the right -->
+	<Border
+		x:Name="BoostedBossContainer"
+		Width="100"
+		Height="Auto"
+		VerticalAlignment="Bottom"
+		HorizontalAlignment="Left"
+		Margin="150,0,0,45"
+		Cursor="Hand"
+		MouseLeftButtonDown="BoostedCreaturesPanel_MouseLeftButtonDown">
+		<Border.ToolTip>
+			<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+				<TextBlock Text="Click to force refresh boosted creatures from luneraot.com" FontWeight="Bold"/>
+			</ToolTip>
+		</Border.ToolTip>
+		<Border.Effect>
+			<DropShadowEffect Color="Black" Direction="270" ShadowDepth="4" Opacity="0.5" BlurRadius="10"/>
+		</Border.Effect>
+		
+		<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Image x:Name="BoostedBossImage"
+				   Width="60"
+				   Height="60"
+				   Stretch="Uniform"
+				   HorizontalAlignment="Center"
+				   Margin="0,3,0,4">
+				<Image.Effect>
+					<DropShadowEffect Color="#FF4444" Direction="0" ShadowDepth="0" Opacity="0.6" BlurRadius="8"/>
+				</Image.Effect>
+			</Image>
+			<TextBlock x:Name="BoostedBossName"
+					   Text="Loading..."
+					   FontFamily="Segoe UI"
+					   FontSize="9"
+					   FontWeight="SemiBold"
+					   Foreground="#F0F0F0"
+					   HorizontalAlignment="Center"
+					   TextAlignment="Center"
+					   TextWrapping="Wrap"
+					   MaxWidth="90"
+					   Margin="0,2,0,2"/>
+			<TextBlock Text="BOSS"
+					   FontFamily="Segoe UI"
+					   FontSize="8"
+					   FontWeight="Medium"
+					   Foreground="#FF4444"
+					   HorizontalAlignment="Center"
+					   TextAlignment="Center"/>
+		</StackPanel>
+	</Border>
+</Grid>
+
+			<!-- Countdowns Section - Positioned at top left -->
+			<Grid x:Name="CountdownsGrid" Grid.Row="2" Grid.RowSpan="2" Width="240" Height="140" 
+				  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="45,-10,0,0">
+				<!-- Main Background Container -->
+				<Border
+					x:Name="CountdownsBackgroundContainer"
+					VerticalAlignment="Stretch"
+					HorizontalAlignment="Stretch"
+					CornerRadius="15">
+					<Border.Background>
+						<SolidColorBrush Color="Transparent"/>
+					</Border.Background>
+				</Border>
+
+				<!-- Title Header -->
+				<Border
+					x:Name="CountdownsTitle"
+					Width="180"
+					Height="Auto"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Center"
+					Margin="0,-15,0,0"
+					CornerRadius="8"
+					Padding="10,5">
+					<Border.Background>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+							<GradientStop Color="#FFD700" Offset="0"/>
+							<GradientStop Color="#FFA500" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.Background>
+					<Border.Effect>
+						<DropShadowEffect Color="Black" Direction="270" ShadowDepth="3" Opacity="0.4" BlurRadius="8"/>
+					</Border.Effect>
+					<TextBlock
+						VerticalAlignment="Center"
+						HorizontalAlignment="Center"
+						FontFamily="Segoe UI"
+						FontSize="13"
+						FontWeight="Bold"
+						Foreground="#1a1a1a"
+						Text="⏱️ UPCOMING EVENTS"/>
+				</Border>
+
+				<!-- Countdowns Container -->
+				<StackPanel
+					x:Name="CountdownsStackPanel"
+					Width="135"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Center"
+					Margin="0,20,0,0">
+					
+					<!-- First Countdown -->
+					<Border
+						x:Name="FirstCountdownContainer"
+						Margin="0,0,0,10"
+						Padding="8,5"
+						CornerRadius="8"
+						Cursor="Hand"
+						MouseLeftButtonDown="CountdownsPanel_MouseLeftButtonDown">
+						<Border.ToolTip>
+							<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+								<TextBlock Text="Click to refresh event countdowns from luneraot.com" FontWeight="Bold"/>
+							</ToolTip>
+						</Border.ToolTip>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							
+							<StackPanel Grid.Column="0">
+								<TextBlock 
+									x:Name="FirstCountdownName"
+									Text="Loading..."
+									FontFamily="Segoe UI"
+									FontSize="12"
+									FontWeight="SemiBold"
+									Foreground="#F0F0F0"/>
+								<TextBlock 
+									x:Name="FirstCountdownTime"
+									Text="--:--:--"
+									FontFamily="Segoe UI"
+									FontSize="14"
+									FontWeight="Bold"
+									Foreground="#FFD700"/>
+							</StackPanel>
+							
+							<TextBlock 
+								Grid.Column="1"
+								Text="⏱️"
+								FontSize="20"
+								VerticalAlignment="Center"
+								Margin="5,0,0,0"
+								Foreground="White"/>
+						</Grid>
+					</Border>
+					
+					<!-- Second Countdown -->
+					<Border
+						x:Name="SecondCountdownContainer"
+						Padding="8,5"
+						CornerRadius="8"
+						Cursor="Hand"
+						MouseLeftButtonDown="CountdownsPanel_MouseLeftButtonDown">
+						<Border.ToolTip>
+							<ToolTip Background="#2a2a2a" BorderBrush="#555" Foreground="White">
+								<TextBlock Text="Click to refresh event countdowns from luneraot.com" FontWeight="Bold"/>
+							</ToolTip>
+						</Border.ToolTip>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							
+							<StackPanel Grid.Column="0">
+								<TextBlock 
+									x:Name="SecondCountdownName"
+									Text="Loading..."
+									FontFamily="Segoe UI"
+									FontSize="12"
+									FontWeight="SemiBold"
+									Foreground="#F0F0F0"/>
+								<TextBlock 
+									x:Name="SecondCountdownTime"
+									Text="--:--:--"
+									FontFamily="Segoe UI"
+									FontSize="14"
+									FontWeight="Bold"
+									Foreground="#FFA500"/>
+							</StackPanel>
+							
+							<TextBlock 
+								Grid.Column="1"
+								Text="⏱️"
+								FontSize="20"
+								VerticalAlignment="Center"
+								Margin="5,0,0,0"
+								Foreground="White"/>
+						</Grid>
+					</Border>
+				</StackPanel>
+			</Grid>
+
+			<!-- Footer -->
+			<Grid Grid.Row="4" Margin="20,0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+				
+				<!-- Version Label -->
+				<TextBlock
+					Grid.Column="0"
+					x:Name="labelVersion"
+					FontFamily="Segoe UI"
+					FontSize="11"
+					FontWeight="SemiBold"
+					Foreground="#B0B0B0"
+					VerticalAlignment="Center"
+					HorizontalAlignment="Left"
+					Text="Version"/>
+				
+				<!-- Company Logo -->
+				<Image
+					Grid.Column="1"
+					x:Name="ImageLogoCompany"
+					Source="{StaticResource LogoCompanyKey}"
+					Height="18"
+					Stretch="Uniform"
+					VerticalAlignment="Center"
+					HorizontalAlignment="Center">
+					<Image.Effect>
+						<DropShadowEffect Color="Black" Direction="270" ShadowDepth="1" Opacity="0.2" BlurRadius="3"/>
+					</Image.Effect>
+				</Image>
+				
+				<!-- Status Indicator -->
+				<StackPanel Grid.Column="2" 
+							VerticalAlignment="Center" 
+							HorizontalAlignment="Right" 
+							Orientation="Horizontal">
+					<Ellipse Width="6" Height="6" 
+							Fill="#4CAF50" 
+							Margin="0,0,5,0">
+						<Ellipse.Effect>
+							<DropShadowEffect Color="#4CAF50" Direction="0" ShadowDepth="0" Opacity="0.8" BlurRadius="3"/>
+						</Ellipse.Effect>
+					</Ellipse>
+					<TextBlock Text="Online" 
+							  FontFamily="Segoe UI" 
+							  FontSize="9" 
+							  FontWeight="Medium" 
+							  Foreground="#4CAF50"/>
+				</StackPanel>
+			</Grid>
+			
+					</Grid>
+	</Border>
+</Window>
